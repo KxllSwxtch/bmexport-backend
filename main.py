@@ -4,14 +4,30 @@ import requests
 
 app = FastAPI()
 
+# Данные прокси
+PROXY_HOST = "45.118.250.2"
+PROXY_PORT = "8000"
+PROXY_USER = "B01vby"
+PROXY_PASS = "GBno0x"
+
+# Формируем строку прокси
+PROXY_URL = f"http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}:{PROXY_PORT}"
+
+# Прокси для HTTP и HTTPS
+PROXIES = {
+    "http": PROXY_URL,
+    "https": PROXY_URL,
+}
+
+
 # CORS Middlware
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Заголовки запроса
 HEADERS = {
@@ -39,7 +55,7 @@ async def get_car_list(car_type: str = "korean", page: int = 1, limit: int = 20)
         else:
             api_url = f"{ENCAR_API_URL}/search/car/list/premium?count=true&q=(And.Hidden.N._.CarType.N.)&sr=%7CModifiedDate%7C0%7C20&page={page}&limit={limit}"
 
-        response = requests.get(api_url, headers=HEADERS, timeout=10)
+        response = requests.get(api_url, headers=HEADERS, proxies=PROXIES, timeout=10)
         response.raise_for_status()
         return response.json()
 
